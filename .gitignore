@@ -1,4 +1,10 @@
 .idea
 target
 *.iml
-examples/src/main/scala/monitor/examples/login/http/
+.DS_Store
+newbenchmarks/
+/.profile
+test/
+/examples/src/main/scala/examples/execute/
+/examples/src/main/scala/examples/generate/
+scripts/local/
