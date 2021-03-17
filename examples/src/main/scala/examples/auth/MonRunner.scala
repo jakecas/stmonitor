@@ -7,6 +7,6 @@ object MonRunner extends App {
   val serverPort = args(0).toInt //1335
   val clientPort = args(1).toInt //1330
   val cm = new ConnectionManager(serverPort, clientPort)
-  val Mon = new Mon(cm, 300)(global, timeout)
+  val Mon = new Mon(cm)(global, timeout)
   Mon.run()
 }
