@@ -1,30 +1,44 @@
 package examples.auth
 
-import monitor.util.ConnectionManager
+import java.io._
+import java.net.{ServerSocket, Socket}
 
-import java.io.{BufferedReader, BufferedWriter, InputStreamReader, OutputStreamWriter}
+class ClientConnectionManager(var serverPort: Int, var clientPort: Int) extends ConnectionManager {
+  var serverIn: BufferedWriter = _; var clientIn: BufferedWriter = _;
+  var serverOut: BufferedReader = _; var clientOut: BufferedReader = _;
 
-class ClientConnectionManager(client: java.net.Socket) extends ConnectionManager {
-  var outB: BufferedWriter = _
-  var inB: BufferedReader = _
+  val serverSocket = new Socket("127.0.0.1", serverPort)
+  val clientSocket = new ServerSocket(clientPort)
 
   private val authR = """AUTH (.+) (.+)""".r
   private val getR = """GET (.+) (.+)""".r
   private val rvkR = """RVK (.+)""".r
+  private val succR = """SUCC (.+)""".r
+  private val failR = """FAIL (.+)""".r
 
   def setup(): Unit = {
-    outB = new BufferedWriter(new OutputStreamWriter(client.getOutputStream))
-    inB = new BufferedReader(new InputStreamReader(client.getInputStream))
+    val client = clientSocket.accept();
+    println(f"[CM] Waiting for requests from Client on ${clientPort} and connected to Server on ${serverPort}")
+    serverIn = new BufferedWriter(new OutputStreamWriter(serverSocket.getOutputStream))
+    serverOut = new BufferedReader(new InputStreamReader(serverSocket.getInputStream))
+    clientIn = new BufferedWriter(new OutputStreamWriter(client.getOutputStream))
+    clientOut = new BufferedReader(new InputStreamReader(client.getInputStream))
   }
 
-  def receive(): Any = inB.readLine() match {
-    case authR(uname, pwd) => Auth(uname, pwd)(null);
-    case getR(resource, tok) => Get(resource, tok)(null);
+  def receiveFromClient(): Any = clientOut.readLine() match {
+    case authR(uname, pwd) => Auth(uname, pwd);
+    case getR(resource, tok) => Get(resource, tok);
     case rvkR(tok) => Rvk(tok);
     case e => e
   }
 
-  def send(x: Any): Unit = x match {
+  def receiveFromServer(): Any = serverOut.readLine() match {
+    case succR(tok) => println("[CM] Received Success"); Succ(tok);
+    case failR(code) => println("[CM] Received Failure"); Fail(code.toInt);
+    case e => e
+  }
+
+  def sendToClient(x: Any): Unit = x match {
     case Succ(tok) => outB.write(f"SUCC ${tok}\r\n"); outB.flush();
     case Res(content) => outB.write(f"RES $content\r\n"); outB.flush();
     case Timeout() => outB.write(f"Timeout\r\n"); outB.flush();
@@ -32,9 +46,14 @@ class ClientConnectionManager(client: java.net.Socket) extends ConnectionManager
     case _ => close(); throw new Exception("[CM] Error: Unexpected message by Mon");
   }
 
+  def sendToServer(x: Any): Unit = x match {
+    case Auth(uname, pwd) => serverIn.write(f"AUTH ${uname} ${pwd}"); serverIn.flush();
+    case _ => close(); throw new Exception("[CM] Error: Unexpected message by Mon");
+  }
+
   def close(): Unit = {
-    outB.flush();
-    inB.close();
-    outB.close();
+    serverIn.flush(); clientIn.flush();
+    serverIn.close(); clientIn.close();
+    serverSocket.close(); clientOut.close();
   }
 }
