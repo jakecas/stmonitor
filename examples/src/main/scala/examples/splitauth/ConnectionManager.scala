@@ -20,9 +20,9 @@ class ConnectionManager(var port: Int) {
   }
 
   def receive(): Any = monIn.readLine() match {
-    case authR(uname, pwd) => println("[CM] Received Auth"); Auth(uname, pwd);
-    case succR(tok) => println("[CM] Received Success"); Succ(tok);
-    case failR(code) => println("[CM] Received Failure"); Fail(code.toInt);
+//    case authR(uname, pwd) => println("[CM] Received Auth"); Auth(uname, pwd);
+//    case succR(tok) => println("[CM] Received Success"); Succ(tok);
+//    case failR(code) => println("[CM] Received Failure"); Fail(code.toInt);
     case e => e
   }
 

@@ -3,6 +3,7 @@
 CLIENT_HOST = '127.0.0.1'
 CLIENT_PORT = 1330
 
+import time
 import re, socket
 
 MSG_SUCC_RE = re.compile('''^SUCC +(.+)''')
@@ -34,3 +35,6 @@ if (__name__ == '__main__'):
         req = 'RVK ' + tok
         print(f'[C] Sending: {req}')
         s.sendall(str.encode(req + '\n'))
+
+end = time.time()
+print("Total time: ", end - start)

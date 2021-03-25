@@ -1,4 +1,3 @@
-package examples.splitauth
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.Duration
@@ -42,7 +41,6 @@ class Mon(cm: ConnectionManager)(implicit ec: ExecutionContext, timeout: Duratio
 		cm.receive() match {
 			case msg @ Succ(_) =>
 				if(util.validateTok(msg.tok, payloads.Auth_3.uname)){
-					println("[Mon] Authenticated! ")
 				} else {
 					cm.close()
 					throw new Exception("[Mon] Validation failed!")

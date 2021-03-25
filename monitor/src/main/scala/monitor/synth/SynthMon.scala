@@ -3,7 +3,7 @@ package monitor.synth
 import monitor.interpreter.STInterpreter
 import monitor.model._
 
-class SynthMon(sessionTypeInterpreter: STInterpreter, path: String) {
+class SynthMon(sessionTypeInterpreter: STInterpreter, path: String, partialIdentityMon: Boolean) {
   private val mon = new StringBuilder()
 
   def getMon(): StringBuilder = {
@@ -71,19 +71,27 @@ class SynthMon(sessionTypeInterpreter: STInterpreter, path: String) {
         mon.append("\tdef send"+statement.statementID+"(cm: ConnectionManager): Unit = {\n")
     }
 
-    mon.append("\t\tcm.receiveFromServer() match {\n")
+    if(partialIdentityMon){
+      mon.append("\t\tcm.receiveFromServer() match {\n")
+    } else {
+      mon.append("\t\tcm.receive() match {\n")
+    }
     mon.append("\t\t\tcase msg @ "+reference+"(")
     addParameters(statement.types)
     mon.append(") =>\n")
 
     if(statement.condition != null){
       handleCondition(statement.condition, statement.statementID)
-      mon.append("\t\t\t\t\tcm.sendToClient(msg)\n")
+      if(partialIdentityMon){
+        mon.append("\t\t\t\t\tcm.sendToClient(msg)\n")
+      }
       handleSendNextCase(statement, isUnique, nextStatement)
       mon.append("\t\t\t\t} else {\n")
       mon.append("\t\t\t\treport(\"[MONITOR] VIOLATION in Assertion: "+statement.condition+"\"); done() }\n")
     } else {
-      mon.append("\t\t\t\tcm.sendToClient(msg)\n")
+      if(partialIdentityMon){
+        mon.append("\t\t\t\tcm.sendToClient(msg)\n")
+      }
       handleSendNextCase(statement, nextStatement)
     }
     mon.append("\t\t\tcase msg @ _ => report(f\"[MONITOR] VIOLATION unknown message: $msg\"); done()\n")
@@ -164,7 +172,11 @@ class SynthMon(sessionTypeInterpreter: STInterpreter, path: String) {
     }
 
     mon.append("  def receive" + statement.statementID + "(cm: ConnectionManager): Unit = {\n")
-    mon.append("\t\tcm.receiveFromClient() match {\n")
+    if(partialIdentityMon){
+      mon.append("\t\tcm.receiveClient() match {\n")
+    } else {
+      mon.append("\t\tcm.receive() match {\n")
+    }
     mon.append("\t\t\tcase msg @ " + reference + "(")
     addParameters(statement.types)
     mon.append(")=>\n")
@@ -233,10 +245,12 @@ class SynthMon(sessionTypeInterpreter: STInterpreter, path: String) {
         handleReceiveNextCase(currentStatement, isUnique, recursiveStatement.body)
 
       case _ =>
-        if(currentStatement.condition==null) {
-          mon.append("\t\t\t\tcm.sendToServer(msg);\n")
-        } else {
-          mon.append("\t\t\t\t\tcm.sendToServer(msg);\n")
+        if(partialIdentityMon) {
+          if (currentStatement.condition == null) {
+            mon.append("\t\t\t\tcm.sendToServer(msg);\n")
+          } else {
+            mon.append("\t\t\t\t\tcm.sendToServer(msg);\n")
+          }
         }
     }
   }
@@ -248,23 +262,25 @@ class SynthMon(sessionTypeInterpreter: STInterpreter, path: String) {
    * @param isUnique A boolean indicating whether the label of the current statement is unique.
    */
   private def handleReceiveCases(statement: ReceiveStatement, isUnique: Boolean): Unit = {
-    var reference = statement.statementID
-    if(isUnique){
-      reference = statement.label
-    }
-    if(statement.condition != null) {
-      mon.append("\t\t\t\t\tcm.sendToServer(" + reference + "(")
-    } else {
-      mon.append("\t\t\t\tcm.sendToServer(" + reference + "(")
-    }
-    for ((k, v) <- statement.types) {
-      if ((k, v) == statement.types.last) {
-        mon.append("msg." + k)
-      } else {
-        mon.append("msg." + k + ", ")
+    if(partialIdentityMon) {
+      var reference = statement.statementID
+      if(isUnique){
+        reference = statement.label
       }
+      if (statement.condition != null) {
+        mon.append("\t\t\t\t\tcm.sendToServer(\" + reference + \"(")
+      } else {
+        mon.append("\t\t\t\tcm.sendToServer(\" + reference + \"(")
+      }
+      for ((k, v) <- statement.types) {
+        if ((k, v) == statement.types.last) {
+          mon.append("msg." + k)
+        } else {
+          mon.append("msg." + k + ", ")
+        }
+      }
+      mon.append("))\n")
     }
-    mon.append("))\n")
   }
 
   /**
@@ -279,7 +295,11 @@ class SynthMon(sessionTypeInterpreter: STInterpreter, path: String) {
     }
 
     mon.append("\tdef send" + statement.label + "(cm: ConnectionManager): Unit = {\n")
-    mon.append("\t\tcm.receiveFromServer() match {\n")
+    if(partialIdentityMon){
+      mon.append("\t\tcm.receiveServer() match {\n")
+    } else {
+      mon.append("\t\tcm.receive() match {\n")
+    }
 
     for (choice <- statement.choices){
       var reference = choice.asInstanceOf[SendStatement].label
@@ -291,12 +311,16 @@ class SynthMon(sessionTypeInterpreter: STInterpreter, path: String) {
       mon.append(") =>\n")
       if(choice.asInstanceOf[SendStatement].condition != null){
         handleCondition(choice.asInstanceOf[SendStatement].condition, choice.asInstanceOf[SendStatement].statementID)
-        mon.append("\t\t\t\t\tcm.sendToClient(msg)\n")
+        if(partialIdentityMon){
+          mon.append("\t\t\t\t\tcm.sendToClient(msg)\n")
+        }
         handleSendNextCase(choice.asInstanceOf[SendStatement], choice.asInstanceOf[SendStatement].continuation)
         mon.append("\t\t\t\t} else {\n")
         mon.append("\t\t\t\treport(\"[MONITOR] VIOLATION in Assertion: "+choice.asInstanceOf[SendStatement].condition+"\"); done() }\n")
       } else {
-        mon.append("\t\t\t\tcm.sendToClient(msg)\n")
+        if(partialIdentityMon){
+          mon.append("\t\t\t\tcm.sendToClient(msg)\n")
+        }
         handleSendNextCase(choice.asInstanceOf[SendStatement], choice.asInstanceOf[SendStatement].continuation)
       }
     }
@@ -316,7 +340,11 @@ class SynthMon(sessionTypeInterpreter: STInterpreter, path: String) {
     }
 
     mon.append("\tdef receive" + statement.label + "(cm: ConnectionManager): Unit = {\n")
-    mon.append("\t\tcm.receiveFromClient() match {\n")
+    if(partialIdentityMon){
+      mon.append("\t\tcm.receiveClient() match {\n")
+    } else {
+      mon.append("\t\tcm.receive() match {\n")
+    }
 
     for (choice <- statement.choices){
       var reference = choice.asInstanceOf[ReceiveStatement].label

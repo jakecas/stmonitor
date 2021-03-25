@@ -18,20 +18,22 @@ def serve(srv, mon):
         s.close()
 
 def handle_connection(s, mon):
-    print('[S] Waiting for request')
-    tmp = s.recv(1024)
-    mon.sendall(tmp)
-    req = tmp.decode().strip()
-    print('[S] Received: '+req)
-    m = MSG_AUTH_RE.match(req)
-    if (m is not None):
-        reply = 'FAIL 1'
-        print('[S] Replying: ', reply)
-        mon.sendall(str.encode(reply+'\n'))
-        s.sendall(str.encode(reply+'\n'))
-    else: # No message regex was matched
-        print('[S] Invalid message')
+    print('[S] Waiting for bad request')
+    for i in range(10000):
+        tmp = s.recv(1024)
+        mon.sendall(tmp)
+        req = tmp.decode().strip()
+        print('[S] Received: '+req)
+        m = MSG_AUTH_RE.match(req)
+        if (m is not None):
+            reply = 'FAIL 1'
+            print('[S] Replying: ', reply)
+            mon.sendall(str.encode(reply+'\n'))
+            s.sendall(str.encode(reply+'\n'))
+        else: # No message regex was matched
+            print('[S] Invalid message')
 
+    print('[S] Waiting for final, valid request')
     tmp = s.recv(1024)
     mon.sendall(tmp)
     req = tmp.decode().strip()

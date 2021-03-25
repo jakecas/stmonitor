@@ -9,7 +9,7 @@ import scala.reflect.runtime._
 import scala.reflect.runtime.universe._
 import scala.tools.reflect.ToolBox
 
-class STInterpreter(sessionType: SessionType, path: String, preamble: String) {
+class STInterpreter(sessionType: SessionType, path: String, preamble: String, partialIdentityMon: Boolean) {
   private val toolbox = currentMirror.mkToolBox()
 
   private var scopes = new mutable.HashMap[String, Scope]()
@@ -18,7 +18,7 @@ class STInterpreter(sessionType: SessionType, path: String, preamble: String) {
 
   private var branches = new mutable.HashMap[Statement, String]()
 
-  var synthMon = new SynthMon(this, path)
+  var synthMon = new SynthMon(this, path, partialIdentityMon)
   var synthProtocol = new SynthProtocol(this, path)
 
   def getRecursiveVarScope(recursiveVar: RecursiveVar): Scope = {

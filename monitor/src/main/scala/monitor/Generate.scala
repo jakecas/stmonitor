@@ -8,6 +8,6 @@ object Generate {
   def main(args: Array[String]): Unit = {
     val synth = new Synth()
     val preamble = Try(args(2))
-    synth.apply(args(0), args(1), preamble.getOrElse(""), synthMonFile = true, synthProtocolFile = false)
+    synth.apply(args(0), args(1), preamble.getOrElse(""), synthMonFile = true, synthProtocolFile = false, partialIdentityMon = false)
   }
 }
