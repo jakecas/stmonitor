@@ -268,9 +268,9 @@ class SynthMon(sessionTypeInterpreter: STInterpreter, path: String, partialIdent
         reference = statement.label
       }
       if (statement.condition != null) {
-        mon.append("\t\t\t\t\tcm.sendToServer(\" + reference + \"(")
+        mon.append("\t\t\t\t\tcm.sendToServer(" + reference + "(")
       } else {
-        mon.append("\t\t\t\tcm.sendToServer(\" + reference + \"(")
+        mon.append("\t\t\t\tcm.sendToServer(" + reference + "(")
       }
       for ((k, v) <- statement.types) {
         if ((k, v) == statement.types.last) {
@@ -296,7 +296,7 @@ class SynthMon(sessionTypeInterpreter: STInterpreter, path: String, partialIdent
 
     mon.append("\tdef send" + statement.label + "(cm: ConnectionManager): Unit = {\n")
     if(partialIdentityMon){
-      mon.append("\t\tcm.receiveServer() match {\n")
+      mon.append("\t\tcm.receiveFromServer() match {\n")
     } else {
       mon.append("\t\tcm.receive() match {\n")
     }
@@ -341,7 +341,7 @@ class SynthMon(sessionTypeInterpreter: STInterpreter, path: String, partialIdent
 
     mon.append("\tdef receive" + statement.label + "(cm: ConnectionManager): Unit = {\n")
     if(partialIdentityMon){
-      mon.append("\t\tcm.receiveClient() match {\n")
+      mon.append("\t\tcm.receiveFromClient() match {\n")
     } else {
       mon.append("\t\tcm.receive() match {\n")
     }

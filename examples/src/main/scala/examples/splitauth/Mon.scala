@@ -1,3 +1,4 @@
+package examples.splitauth
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.Duration
