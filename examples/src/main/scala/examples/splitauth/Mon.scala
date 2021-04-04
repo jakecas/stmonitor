@@ -1,4 +1,3 @@
-package examples.splitauth
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.Duration
@@ -24,9 +23,10 @@ class Mon(cm: ConnectionManager)(implicit ec: ExecutionContext, timeout: Duratio
     cm.close()
   }
   def receiveAuth_3(cm: ConnectionManager): Unit = {
-		cm.receive() match {
+		cm.receiveClient() match {
 			case msg @ Auth(_, _)=>
 				if(util.validateUname(msg.uname)){
+					cm.sendToServer(Auth(msg.uname, msg.pwd))
 					payloads.Auth_3.uname = msg.uname
 					sendInternalChoice1(cm)
 				} else {
@@ -39,14 +39,16 @@ class Mon(cm: ConnectionManager)(implicit ec: ExecutionContext, timeout: Duratio
 		}
 	}
 	def sendInternalChoice1(cm: ConnectionManager): Unit = {
-		cm.receive() match {
+		cm.receiveFromServer() match {
 			case msg @ Succ(_) =>
 				if(util.validateTok(msg.tok, payloads.Auth_3.uname)){
+					cm.sendToClient(msg)
 				} else {
 					cm.close()
 					throw new Exception("[Mon] Validation failed!")
 				}
 			case msg @ Fail(_) =>
+				cm.sendToClient(msg)
 				receiveAuth_3(cm)
 			case e => 
 				cm.close()

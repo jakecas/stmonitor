@@ -173,7 +173,7 @@ class SynthMon(sessionTypeInterpreter: STInterpreter, path: String, partialIdent
 
     mon.append("  def receive" + statement.statementID + "(cm: ConnectionManager): Unit = {\n")
     if(partialIdentityMon){
-      mon.append("\t\tcm.receiveClient() match {\n")
+      mon.append("\t\tcm.receiveFromClient() match {\n")
     } else {
       mon.append("\t\tcm.receive() match {\n")
     }

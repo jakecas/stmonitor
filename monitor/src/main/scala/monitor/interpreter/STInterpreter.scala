@@ -381,7 +381,10 @@ class STInterpreter(sessionType: SessionType, path: String, preamble: String, pa
            |$stringVariables
            |$condition
            |""".stripMargin
+      logger.info("Parsing...")
+      logger.info(f"${eval}")
       val tree = toolbox.parse(eval)
+      logger.info("Typechecking...")
       val checked = toolbox.typecheck(tree)
       checked.tpe == Boolean
     }
