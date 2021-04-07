@@ -1,0 +1,2 @@
+This is a test text file.
+It starts on the server, and should be sent to the client.
