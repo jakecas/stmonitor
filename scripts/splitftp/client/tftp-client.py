@@ -3,6 +3,8 @@ from timeit import Timer
 
 SERVER_HOST = '127.0.0.1'
 SERVER_PORT = int(sys.argv[1])
+MON_HOST = '127.0.0.1'
+MON_PORT = int(sys.argv[2])
 
 MSG_BLOCKR_RE = re.compile('''^BLOCKR ([0-9]+) ([0-9]+) ([\S\s]+)''')
 MSG_ACKWI_RE = re.compile('''^ACKWI''')
@@ -17,27 +19,34 @@ MSG_BLOCKW = "BLOCKW "
 MSG_CLOSE = "CLOSE"
 
 
-def handle_read(s, filename):
+def handle_read(s, m, filename):
     s.sendall(str.encode(MSG_READ + filename + '\n'))
+    m.sendall(str.encode(MSG_READ + filename + '\n'))
     file = open("/home/jakec/Workspace/Uni/Thesis/ChrisBartoloBurlo/stmonitor/scripts/ftp/client/"+filename, 'w')
 
     req = s.recv(1024).decode().strip()
+    m.sendall(str.encode(req))
     block = MSG_BLOCKR_RE.match(req)
 
     while block.group(2) == "512":
         file.write(block.group(2))
         s.sendall(str.encode(MSG_ACKR + block.group(1) + "\n"))
+        m.sendall(str.encode(MSG_ACKR + block.group(1) + "\n"))
         req = s.recv(552).decode().strip()
+        m.sendall(str.encode(req))
         block = MSG_BLOCKR_RE.match(req)
 
     file.write(block.group(3))
     s.sendall(str.encode(MSG_ACKRF + "\n"))
+    m.sendall(str.encode(MSG_ACKRF + "\n"))
     file.close()
 
 
 def handle_write(s, filename):
     s.sendall(str.encode(MSG_WRITE + filename + '\n'))
+    m.sendall(str.encode(MSG_WRITE + filename + '\n'))
     rsp = s.recv(6).decode().strip()
+    m.sendall(str.encode(rsp))
     if MSG_ACKWI_RE.match(rsp) is None:
         print("[C] ERROR: Did not receive ACKWI after sending WRITE request to server!")
     file = open(filename, 'r')
@@ -46,13 +55,17 @@ def handle_write(s, filename):
 
     while len(filecontents[(c-1)*512:c*512]) == 512:
         s.sendall(str.encode(MSG_BLOCKW + str(c) + " 512 " + filecontents[(c-1)*512:c*512] + '\n'))
+        m.sendall(str.encode(MSG_BLOCKW + str(c) + " 512 " + filecontents[(c-1)*512:c*512] + '\n'))
         rsp = s.recv(32).decode().strip()
+        m.sendall(str.encode(rsp))
         if MSG_ACKW_RE.match(rsp) is None:
             print("[C] ERROR: Did not receive ACKW after sending block ", c, " to server!")
         c += 1
 
     s.sendall(str.encode(MSG_BLOCKW + str(c) + " " + str(len(filecontents[(c-1)*512:])) + " " + filecontents[(c-1)*512:] + '\n'))
+    m.sendall(str.encode(MSG_BLOCKW + str(c) + " " + str(len(filecontents[(c-1)*512:])) + " " + filecontents[(c-1)*512:] + '\n'))
     rsp = s.recv(6).decode().strip()
+    m.sendall(str.encode(rsp))
     if MSG_ACKWF_RE.match(rsp) is None:
         print("[C] ERROR: Did not receive ACKWF after sending file to server!")
 
@@ -67,21 +80,26 @@ file = str(sys.argv[4])
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 while s.connect_ex((SERVER_HOST,SERVER_PORT)) != 0:
     time.sleep(0.1)
+m = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+while m.connect_ex((MON_HOST,MON_PORT)) != 0:
+    time.sleep(0.1)
 
 if read and write:
     for i in range(iterations):
-        handle_read(s, file)
-        handle_write(s, file)
+        handle_read(s, m, file)
+        handle_write(s, m, file)
 elif read:
     for i in range(iterations):
-        handle_read(s, file)
+        handle_read(s, m, file)
 elif write:
     for i in range(iterations):
-        handle_write(s, file)
+        handle_write(s, m, file)
 
-t = Timer(lambda: handle_write(s, file))
+t = Timer(lambda: handle_write(s, m, file))
 print(min(t.repeat(repeat=1000, number=1)))
 
 
 s.sendall(str.encode(MSG_CLOSE))
+m.sendall(str.encode(MSG_CLOSE))
 s.close()
+m.close()

@@ -2,6 +2,8 @@ import re, socket
 
 SERVER_HOST = '127.0.0.1'
 SERVER_PORT = 4021
+MON_HOST = '127.0.0.1'
+MON_PORT = int(sys.argv[2])
 
 MSG_READ_RE = re.compile('''^READ +(.+)''')
 MSG_WRITE_RE = re.compile('''^WRITE +(.+)''')
@@ -15,28 +17,38 @@ MSG_ACKWI = "ACKWI"
 MSG_ACKW = "ACKW "
 MSG_ACKWF = "ACKWF"
 
-def serve(srv):
+def send_wrapper(s, m, msg):
+    s.sendall(msg)
+    m.sendall(msg)
+
+
+def recv_wrapper(s, m, size):
+    msg = s.recv(size)
+    m.sendall(msg)
+    return msg.decode().strip()
+
+
+def serve(srv, m):
     print('[S] Waiting for new connections')
     (s, address) = srv.accept()
     print('[S] New connection from',address)
-    handle_connection(s)
+    handle_connection(s, m)
     print('[S] Closing connection')
     s.close()
 
 
-def handle_connection(s):
+def handle_connection(s, m):
     while 1:
         print('[S] Waiting for READ, WRITE or CLOSE request')
-        req = s.recv(1024).decode().strip()
-        print("Received: ", req)
+        req = recv_wrapper(s, m, 1024)
         m_read = MSG_READ_RE.match(req)
         m_write = MSG_WRITE_RE.match(req)
         m_close = MSG_CLOSE_RE.match(req)
 
         if m_read is not None:
-            handle_read(s, m_read)
+            handle_read(s, m_read, m)
         elif m_write is not None:
-            handle_write(s, m_write)
+            handle_write(s, m_write, m)
         elif m_close is not None:
             print("[S] Received CLOSE request.")
             return
@@ -45,7 +57,7 @@ def handle_connection(s):
             return
 
 
-def handle_read(s, msg):
+def handle_read(s, msg, m):
     print("[S] Received READ request.")
     filename = msg.group(1)
     file = open(filename, 'r')
@@ -53,38 +65,37 @@ def handle_read(s, msg):
     c = 1
 
     while len(filecontents[(c-1)*512:c*512]) == 512:
-        s.sendall(str.encode(MSG_BLOCKR + str(c) + " 512 " + filecontents[(c-1)*512:c*512] + '\n'))
-        rsp = s.recv(32).decode().strip()
+        send_wrapperl(s, m, str.encode(MSG_BLOCKR + str(c) + " 512 " + filecontents[(c-1)*512:c*512] + '\n'))
+        rsp = recv_wrapper(s, m, 32)
         if MSG_ACKR_RE.match(rsp) is None:
             print("[S] ERROR: Did not receive ACKR after sending block ", c, " to client!")
         c += 1
 
-    print("Sending: ", MSG_BLOCKR + str(c) + " " + str(len(filecontents[(c-1)*512:])) + " " + filecontents[(c-1)*512:] + '\n')
-    s.sendall(str.encode(MSG_BLOCKR + str(c) + " " + str(len(filecontents[(c-1)*512:])) + " " + filecontents[(c-1)*512:] + '\n'))
-    rsp = s.recv(6).decode().strip()
+    send_wrapper(s, m, str.encode(MSG_BLOCKR + str(c) + " " + str(len(filecontents[(c-1)*512:])) + " " + filecontents[(c-1)*512:] + '\n'))
+    rsp = recv_wrapper(s, m, 6)
     if MSG_ACKRF_RE.match(rsp) is None:
         print("[S] ERROR: Did not receive ACKRF after sending file to client!")
 
     file.close()
 
 
-def handle_write(s, msg):
+def handle_write(s, msg, m):
     print("[S] Received WRITE request.")
     filename = msg.group(1)
     file = open("/home/jakec/Workspace/Uni/Thesis/ChrisBartoloBurlo/stmonitor/scripts/ftp/server/"+filename, 'w')
-    s.sendall(str.encode(MSG_ACKWI + "\n"))
+    send_wrapper(s, m, str.encode(MSG_ACKWI + "\n"))
 
-    req = s.recv(552).decode().strip()
+    req = recv_wrapper(s, m, 552)
     block = MSG_BLOCKW_RE.match(req)
 
     while block.group(2) == "512":
         file.write(block.group(3))
-        s.sendall(str.encode(MSG_ACKW + block.group(1) + '\n'))
-        req = s.recv(552).decode().strip()
+        send_wrapper(s, m, str.encode(MSG_ACKW + block.group(1) + '\n'))
+        req = recv_wrapper(s, m, 552)
         block = MSG_BLOCKW_RE.match(req)
 
     file.write(block.group(3))
-    s.sendall(str.encode(MSG_ACKWF + '\n'))
+    send_wrapper(s, m, str.encode(MSG_ACKWF + '\n'))
     file.close()
 
 
@@ -95,7 +106,10 @@ if __name__ == '__main__':
     srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)  # Avoid TIME_WAIT
     srv.bind((SERVER_HOST, SERVER_PORT))
+    m = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    while m.connect_ex((MON_HOST,MON_PORT)) != 0:
+        time.sleep(0.1)
     print('[S] Listening on ', SERVER_HOST, SERVER_PORT)
     srv.listen(8)
-    serve(srv)
+    serve(srv, m)
     srv.close()
