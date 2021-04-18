@@ -39,7 +39,7 @@ class Synth {
             monFile.close()
           }
           if(synthProtocolFile){
-            lazy val protocolFile = new PrintWriter(new File(directoryPath+"/CPSPc.scala"))
+            lazy val protocolFile = new PrintWriter(new File(directoryPath+"/ProtocolClasses.scala"))
             protocolFile.write(protocol.toString)
             protocolFile.close()
           }

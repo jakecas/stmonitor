@@ -14,7 +14,6 @@ class SynthProtocol(sessionTypeInterpreter: STInterpreter, path: String) {
 
   def init(preamble: String): Unit = {
     if (preamble!="") protocol.append(preamble+"\n")
-    protocol.append("import lchannels.$\n")
   }
 
   def handleSendChoice(label: String): Unit ={
@@ -33,7 +32,7 @@ class SynthProtocol(sessionTypeInterpreter: STInterpreter, path: String) {
     }
     handleParam(statement)
     protocol.append(")")
-    handleSendNextCase(nextStatement, isNextUnique)
+//    handleSendNextCase(nextStatement, isNextUnique)
 
     label match {
       case null =>
@@ -51,7 +50,7 @@ class SynthProtocol(sessionTypeInterpreter: STInterpreter, path: String) {
     }
     handleParam(statement)
     protocol.append(")")
-    handleReceiveNextCase(nextStatement, isNextUnique)
+//    handleReceiveNextCase(nextStatement, isNextUnique)
 
     label match {
       case null =>
