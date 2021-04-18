@@ -12,11 +12,13 @@ class ConnectionManager(var serverPort: Int, var clientPort: Int) {
 
   private val readR = """^READ +(.+)""".r
   private val blockrR = """^BLOCKR ([0-9]+) ([0-9]+) ([\S\s]+)""".r
+  private val blockrnR = """^BLOCKR ([0-9]+) ([0-9]+) """.r
   private val ackrR = """^ACKR +(.+)""".r
   private val ackrfR = """^ACKRF""".r
 
   private val writeR = """^WRITE +(.+)""".r
   private val blockwR = """^BLOCKW ([0-9]+) ([0-9]+) ([\S\s]+)""".r
+  private val blockwnR = """^BLOCKW ([0-9]+) ([0-9]+) """.r
   private val ackwiR = """^ACKWI""".r
   private val ackwR = """^ACKW +(.+)""".r
   private val ackwfR = """^ACKWF""".r
@@ -33,48 +35,66 @@ class ConnectionManager(var serverPort: Int, var clientPort: Int) {
   }
 
   def receiveFromClient(): Any = clientOut.readLine() match {
-    case readR(filename) => println("[CM] Received READ"); Read(filename);
-    case writeR(filename) => println("[CM] Received WRITE"); Write(filename);
+    case readR(filename) => Read(filename);
+    case writeR(filename) => Write(filename);
     case blockwR(c, size, data) =>
-      println(f"[CM] Received BLOCKW ${c} ${size} ${data}")
       var fulldata = data
       while(fulldata.length < size.toInt)
         fulldata += "\n" + clientOut.readLine()
-      BlockW(c.toInt, size.toInt, fulldata)
-    case ackrR(c) => println(f"[CM] Received ACKR ${c}"); AckR(c.toInt);
-    case ackrfR() => println("[CM] Received ACKRF"); AckRF();
-    case closeR() => println("[CM] Received CLOSE"); Close();
+      BlockW(c.toInt, size.toInt, fulldata);
+    case blockwnR(c, size) =>
+      var data = ""
+      if(size.toInt == 1){
+        data = "\n"
+      } else {
+        while (data.length < size.toInt) {
+          data += "\n" + clientOut.readLine()
+        }
+      }
+      BlockW(c.toInt, size.toInt, data);
+    case ackrR(c) => AckR(c.toInt);
+    case ackrfR() => AckRF();
+    case closeR() => Close();
     case e => e
   }
 
   def receiveFromServer(): Any = serverOut.readLine() match {
     case blockrR(c, size, data) =>
-      println(f"[CM] Received BLOCKR ${c} ${size}")
       var fulldata = data
       while(fulldata.length < size.toInt)
         fulldata += "\n" + serverOut.readLine()
       BlockR(c.toInt, size.toInt, fulldata);
-    case ackwiR() => println("[CM] Received ACKWI"); AckWI();
-    case ackwR(c) => println(f"[CM] Received ACKW ${c}"); AckW(c.toInt);
-    case ackwfR() => println("[CM] Received ACKWF"); AckWF();
+    case blockrnR(c, size) =>
+      var data = ""
+      if(size.toInt == 1){
+        data = "\n"
+      } else {
+        while (data.length < size.toInt) {
+          data += "\n" + serverOut.readLine()
+        }
+      }
+      BlockR(c.toInt, size.toInt, data);
+    case ackwiR() => AckWI();
+    case ackwR(c) => AckW(c.toInt);
+    case ackwfR() => AckWF();
     case e => e
   }
 
   def sendToClient(x: Any): Unit = x match {
-    case BlockR(c, size, data) => clientIn.write(f"BLOCKR ${c} ${size} ${data}"); clientIn.flush()
-    case AckWI() => clientIn.write(f"ACKWI"); clientIn.flush()
-    case AckW(c) => clientIn.write(f"ACKW ${c}"); clientIn.flush()
-    case AckWF() => clientIn.write(f"ACKWF"); clientIn.flush()
+    case BlockR(c, size, data) => clientIn.write(f"BLOCKR ${c} ${size} ${data}\n"); clientIn.flush();
+    case AckWI() => clientIn.write(f"ACKWI\n"); clientIn.flush();
+    case AckW(c) => clientIn.write(f"ACKW ${c}\n"); clientIn.flush();
+    case AckWF() => clientIn.write(f"ACKWF\n"); clientIn.flush();
     case _ => close(); throw new Exception("[CM] Error: Unexpected message by Mon");
   }
 
   def sendToServer(x: Any): Unit = x match {
-    case Write(filename) => serverIn.write(f"WRITE ${filename}"); serverIn.flush()
-    case Read(filename) => serverIn.write(f"READ ${filename}"); serverIn.flush()
-    case BlockW(c, size, data) => serverIn.write(f"BLOCKW ${c} ${size} ${data}"); serverIn.flush()
-    case AckR(c) => serverIn.write(f"ACKR ${c}"); serverIn.flush()
-    case AckRF() => serverIn.write(f"ACKRF"); serverIn.flush()
-    case Close() => serverIn.write(f"CLOSE"); serverIn.flush()
+    case Write(filename) => serverIn.write(f"WRITE ${filename}\n"); serverIn.flush();
+    case Read(filename) => serverIn.write(f"READ ${filename}\n"); serverIn.flush();
+    case BlockW(c, size, data) => serverIn.write(f"BLOCKW ${c} ${size} ${data}\n"); serverIn.flush();
+    case AckR(c) => serverIn.write(f"ACKR ${c}\n"); serverIn.flush();
+    case AckRF() => serverIn.write(f"ACKRF\n"); serverIn.flush();
+    case Close() => serverIn.write(f"CLOSE\n"); serverIn.flush();
     case _ => close(); throw new Exception("[CM] Error: Unexpected message by Mon");
   }
 

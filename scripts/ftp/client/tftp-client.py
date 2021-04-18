@@ -25,7 +25,7 @@ def handle_read(s, filename):
     block = MSG_BLOCKR_RE.match(req)
 
     while block.group(2) == "512":
-        file.write(block.group(2))
+        file.write(block.group(3))
         s.sendall(str.encode(MSG_ACKR + block.group(1) + "\n"))
         req = s.recv(552).decode().strip()
         block = MSG_BLOCKR_RE.match(req)
@@ -79,8 +79,8 @@ elif write:
     for i in range(iterations):
         handle_write(s, file)
 
-t = Timer(lambda: handle_write(s, file))
-print(min(t.repeat(repeat=1000, number=1)))
+#t = Timer(lambda: handle_write(s, file))
+#print(min(t.repeat(repeat=1000, number=1)))
 
 
 s.sendall(str.encode(MSG_CLOSE))

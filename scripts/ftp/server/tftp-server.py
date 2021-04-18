@@ -28,7 +28,6 @@ def handle_connection(s):
     while 1:
         print('[S] Waiting for READ, WRITE or CLOSE request')
         req = s.recv(1024).decode().strip()
-        print("Received: ", req)
         m_read = MSG_READ_RE.match(req)
         m_write = MSG_WRITE_RE.match(req)
         m_close = MSG_CLOSE_RE.match(req)
@@ -59,7 +58,6 @@ def handle_read(s, msg):
             print("[S] ERROR: Did not receive ACKR after sending block ", c, " to client!")
         c += 1
 
-    print("Sending: ", MSG_BLOCKR + str(c) + " " + str(len(filecontents[(c-1)*512:])) + " " + filecontents[(c-1)*512:] + '\n')
     s.sendall(str.encode(MSG_BLOCKR + str(c) + " " + str(len(filecontents[(c-1)*512:])) + " " + filecontents[(c-1)*512:] + '\n'))
     rsp = s.recv(6).decode().strip()
     if MSG_ACKRF_RE.match(rsp) is None:
