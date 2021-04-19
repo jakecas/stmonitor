@@ -19,9 +19,9 @@ MSG_CLOSE = "CLOSE"
 
 def handle_read(s, filename):
     s.sendall(str.encode(MSG_READ + filename + '\n'))
-    file = open("/home/jakec/Workspace/Uni/Thesis/ChrisBartoloBurlo/stmonitor/scripts/ftp/client/"+filename, 'w')
+    file = open("/home/jakec/Workspace/Uni/Thesis/Code/stmonitor/scripts/ftp/client/"+filename, 'w')
 
-    req = s.recv(1024).decode().strip()
+    req = s.recv(552).decode().strip()
     block = MSG_BLOCKR_RE.match(req)
 
     while block.group(2) == "512":

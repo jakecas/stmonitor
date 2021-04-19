@@ -69,7 +69,7 @@ def handle_read(s, msg):
 def handle_write(s, msg):
     print("[S] Received WRITE request.")
     filename = msg.group(1)
-    file = open("/home/jakec/Workspace/Uni/Thesis/ChrisBartoloBurlo/stmonitor/scripts/ftp/server/"+filename, 'w')
+    file = open("/home/jakec/Workspace/Uni/Thesis/Code/stmonitor/scripts/ftp/server/"+filename, 'w')
     s.sendall(str.encode(MSG_ACKWI + "\n"))
 
     req = s.recv(552).decode().strip()
