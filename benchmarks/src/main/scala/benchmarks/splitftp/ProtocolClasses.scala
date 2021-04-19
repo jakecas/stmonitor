@@ -1,4 +1,4 @@
-package benchmarks.ftp
+package benchmarks.splitftp
 
 sealed abstract class ExternalChoice2
 case class Read(file: String) extends ExternalChoice2

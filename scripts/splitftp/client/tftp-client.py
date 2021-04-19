@@ -18,35 +18,38 @@ MSG_ACKRF = "ACKRF"
 MSG_BLOCKW = "BLOCKW "
 MSG_CLOSE = "CLOSE"
 
+def send_wrapper(s, m, msg):
+    s.sendall(msg)
+    m.sendall(msg)
+
+
+def recv_wrapper(s, m, size):
+    msg = s.recv(size)
+    m.sendall(msg)
+    return msg.decode().strip()
+
 
 def handle_read(s, m, filename):
-    s.sendall(str.encode(MSG_READ + filename + '\n'))
-    m.sendall(str.encode(MSG_READ + filename + '\n'))
-    file = open("/home/jakec/Workspace/Uni/Thesis/ChrisBartoloBurlo/stmonitor/scripts/ftp/client/"+filename, 'w')
+    send_wrapper(s, m, str.encode(MSG_READ + filename + '\n'))
+    file = open("/home/jakec/Workspace/Uni/Thesis/Code/stmonitor/scripts/ftp/client/"+filename, 'w')
 
-    req = s.recv(1024).decode().strip()
-    m.sendall(str.encode(req))
+    req = recv_wrapper(s, m, 552)
     block = MSG_BLOCKR_RE.match(req)
 
     while block.group(2) == "512":
-        file.write(block.group(2))
-        s.sendall(str.encode(MSG_ACKR + block.group(1) + "\n"))
-        m.sendall(str.encode(MSG_ACKR + block.group(1) + "\n"))
-        req = s.recv(552).decode().strip()
-        m.sendall(str.encode(req))
+        file.write(block.group(3))
+        send_wrapper(s, m, str.encode(MSG_ACKR + block.group(1) + "\n"))
+        req = recv_wrapper(s, m, 552)
         block = MSG_BLOCKR_RE.match(req)
 
     file.write(block.group(3))
-    s.sendall(str.encode(MSG_ACKRF + "\n"))
-    m.sendall(str.encode(MSG_ACKRF + "\n"))
+    send_wrapper(s, m, str.encode(MSG_ACKRF + "\n"))
     file.close()
 
 
 def handle_write(s, filename):
-    s.sendall(str.encode(MSG_WRITE + filename + '\n'))
-    m.sendall(str.encode(MSG_WRITE + filename + '\n'))
-    rsp = s.recv(6).decode().strip()
-    m.sendall(str.encode(rsp))
+    send_wrapper(s, m, str.encode(MSG_WRITE + filename + '\n'))
+    rsp = recv_wrapper(s, m, 6)
     if MSG_ACKWI_RE.match(rsp) is None:
         print("[C] ERROR: Did not receive ACKWI after sending WRITE request to server!")
     file = open(filename, 'r')
@@ -54,18 +57,14 @@ def handle_write(s, filename):
     c = 1
 
     while len(filecontents[(c-1)*512:c*512]) == 512:
-        s.sendall(str.encode(MSG_BLOCKW + str(c) + " 512 " + filecontents[(c-1)*512:c*512] + '\n'))
-        m.sendall(str.encode(MSG_BLOCKW + str(c) + " 512 " + filecontents[(c-1)*512:c*512] + '\n'))
-        rsp = s.recv(32).decode().strip()
-        m.sendall(str.encode(rsp))
+        send_wrapper(s, m, str.encode(MSG_BLOCKW + str(c) + " 512 " + filecontents[(c-1)*512:c*512] + '\n'))
+        rsp = recv_wrapper(s, m, 32)
         if MSG_ACKW_RE.match(rsp) is None:
             print("[C] ERROR: Did not receive ACKW after sending block ", c, " to server!")
         c += 1
 
-    s.sendall(str.encode(MSG_BLOCKW + str(c) + " " + str(len(filecontents[(c-1)*512:])) + " " + filecontents[(c-1)*512:] + '\n'))
-    m.sendall(str.encode(MSG_BLOCKW + str(c) + " " + str(len(filecontents[(c-1)*512:])) + " " + filecontents[(c-1)*512:] + '\n'))
-    rsp = s.recv(6).decode().strip()
-    m.sendall(str.encode(rsp))
+    send_wrapper(s, m, str.encode(MSG_BLOCKW + str(c) + " " + str(len(filecontents[(c-1)*512:])) + " " + filecontents[(c-1)*512:] + '\n'))
+    rsp = recv_wrapper(s, m, 6)
     if MSG_ACKWF_RE.match(rsp) is None:
         print("[C] ERROR: Did not receive ACKWF after sending file to server!")
 
@@ -99,7 +98,6 @@ t = Timer(lambda: handle_write(s, m, file))
 print(min(t.repeat(repeat=1000, number=1)))
 
 
-s.sendall(str.encode(MSG_CLOSE))
-m.sendall(str.encode(MSG_CLOSE))
+send_wrapper(s, m, str.encode(MSG_CLOSE))
 s.close()
 m.close()

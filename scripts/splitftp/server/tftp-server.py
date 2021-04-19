@@ -65,7 +65,7 @@ def handle_read(s, msg, m):
     c = 1
 
     while len(filecontents[(c-1)*512:c*512]) == 512:
-        send_wrapperl(s, m, str.encode(MSG_BLOCKR + str(c) + " 512 " + filecontents[(c-1)*512:c*512] + '\n'))
+        send_wrapper(s, m, str.encode(MSG_BLOCKR + str(c) + " 512 " + filecontents[(c-1)*512:c*512] + '\n'))
         rsp = recv_wrapper(s, m, 32)
         if MSG_ACKR_RE.match(rsp) is None:
             print("[S] ERROR: Did not receive ACKR after sending block ", c, " to client!")
@@ -82,7 +82,7 @@ def handle_read(s, msg, m):
 def handle_write(s, msg, m):
     print("[S] Received WRITE request.")
     filename = msg.group(1)
-    file = open("/home/jakec/Workspace/Uni/Thesis/ChrisBartoloBurlo/stmonitor/scripts/ftp/server/"+filename, 'w')
+    file = open("/home/jakec/Workspace/Uni/Thesis/Code/stmonitor/scripts/ftp/server/"+filename, 'w')
     send_wrapper(s, m, str.encode(MSG_ACKWI + "\n"))
 
     req = recv_wrapper(s, m, 552)
