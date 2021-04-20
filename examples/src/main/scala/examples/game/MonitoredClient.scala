@@ -9,8 +9,8 @@ import scala.io.StdIn
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object Client {
-  def apply(Server: Out[InternalChoice1])(implicit ec: ExecutionContext, timeout: Duration) {
-    var s = Server
+  def apply(server: Out[ExternalChoice1])(implicit ec: ExecutionContext, timeout: Duration) {
+    var s = server
     var quit = false
     while (!quit) {
       print("Enter guess (-1 to quit): ")
@@ -22,7 +22,7 @@ object Client {
 
       } else {
         println("[C] Sending Guess(" + num + ")")
-        val repc: In[ExternalChoice1] = s !! Guess(num)
+        val repc: In[InternalChoice1] = s !! Guess(num)
 
         repc ? {
           case Correct(ans) =>
@@ -42,8 +42,11 @@ object MonitoredClient extends App {
   def run() = main(Array())
   val timeout = Duration.Inf
 
-  val (in, out) = LocalChannel.factory[InternalChoice1]()
-  val mon = new Mon(new ConnectionManager(), in, 300)(global, timeout)
+  val (in, out) = LocalChannel.factory[ExternalChoice1]()
+  def report(msg: String): Unit = {
+    println(msg)
+  }
+  val mon = new Monitor(new ServerConnectionManager(), in, 300, report)(global, timeout)
 
   val monThread = new Thread {
     override def run(): Unit = {
