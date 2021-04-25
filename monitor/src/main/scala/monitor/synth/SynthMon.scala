@@ -85,7 +85,7 @@ class SynthMon(sessionTypeInterpreter: STInterpreter, path: String, partialIdent
       if(partialIdentityMon){
         mon.append("\t\t\t\t\tcm.sendToClient(msg)\n")
       }
-      handleSendNextCase(statement, isUnique, nextStatement)
+      handleSendNextCase(statement, nextStatement)
       mon.append("\t\t\t\t} else {\n")
       mon.append("\t\t\t\treport(\"[MONITOR] VIOLATION in Assertion: "+statement.condition+"\"); done() }\n")
     } else {

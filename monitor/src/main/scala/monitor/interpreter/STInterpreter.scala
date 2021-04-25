@@ -1,5 +1,6 @@
 package monitor.interpreter
 
+import com.typesafe.scalalogging.Logger
 import monitor.model._
 import monitor.model.Scope
 import monitor.synth.{SynthMon, SynthProtocol}
@@ -363,6 +364,7 @@ class STInterpreter(sessionType: SessionType, path: String, preamble: String, pa
    * @return Whether the condition is of type boolean or not.
    */
   private def checkCondition(label: String, types: Map[String, String], condition: String): Boolean ={
+    val logger = Logger("STInterpreter")
     if(condition != null) {
       var util = ""
       if(condition.contains("util.")){
