@@ -1,4 +1,4 @@
-package benchmarks.splitftp
+package examples.ftp
 
 object util {
   def validateFilename(file: String): Boolean = {

@@ -1,4 +1,4 @@
-package benchmarks.splitftp
+package examples.splitftp
 
 import java.io._
 import java.net.{ServerSocket, Socket}
@@ -10,11 +10,13 @@ class ConnectionManager(var port: Int) {
 
   private val readR = """^READ +(.+)""".r
   private val blockrR = """^BLOCKR ([0-9]+) ([0-9]+) ([\S\s]+)""".r
+  private val blockrnR = """^BLOCKR ([0-9]+) ([0-9]+) """.r
   private val ackrR = """^ACKR +(.+)""".r
   private val ackrfR = """^ACKRF""".r
 
   private val writeR = """^WRITE +(.+)""".r
   private val blockwR = """^BLOCKW ([0-9]+) ([0-9]+) ([\S\s]+)""".r
+  private val blockwnR = """^BLOCKW ([0-9]+) ([0-9]+) """.r
   private val ackwiR = """^ACKWI""".r
   private val ackwR = """^ACKW +(.+)""".r
   private val ackwfR = """^ACKWF""".r
@@ -28,10 +30,9 @@ class ConnectionManager(var port: Int) {
   }
 
   def receive(): Any = monOut.readLine() match {
-    case readR(filename) => println("[CM] Received READ"); Read(filename);
-    case writeR(filename) => println("[CM] Received WRITE"); Write(filename);
+    case readR(filename) => Read(filename);
+    case writeR(filename) => Write(filename);
     case blockwR(c, size, data) =>
-      println(f"[CM] Received BLOCKW ${c} ${size} ${data}")
       var fulldata = data
       while(fulldata.length < size.toInt)
         fulldata += "\n" + monOut.readLine()
@@ -45,13 +46,11 @@ class ConnectionManager(var port: Int) {
           data += "\n" + monOut.readLine()
         }
       }
-      println(f"[CM] Received BLOCKW ${c} ${size} ${data}")
       BlockW(c.toInt, size.toInt, data);
-    case ackrR(c) => println(f"[CM] Received ACKR ${c}"); AckR(c.toInt);
-    case ackrfR() => println("[CM] Received ACKRF"); AckRF();
-    case closeR() => println("[CM] Received CLOSE"); Close();
+    case ackrR(c) => AckR(c.toInt);
+    case ackrfR() => AckRF();
+    case closeR() => Close();
     case blockrR(c, size, data) =>
-      println(f"[CM] Received BLOCKR ${c} ${size} ${data}")
       var fulldata = data
       while(fulldata.length < size.toInt)
         fulldata += "\n" + monOut.readLine()
@@ -65,11 +64,10 @@ class ConnectionManager(var port: Int) {
           data += "\n" + monOut.readLine()
         }
       }
-      println(f"[CM] Received BLOCKR ${c} ${size} ${data}")
       BlockR(c.toInt, size.toInt, data);
-    case ackwiR() => println("[CM] Received ACKWI"); AckWI();
-    case ackwR(c) => println(f"[CM] Received ACKW ${c}"); AckW(c.toInt);
-    case ackwfR() => println("[CM] Received ACKWF"); AckWF();
+    case ackwiR() => AckWI();
+    case ackwR(c) => AckW(c.toInt);
+    case ackwfR() => AckWF();
     case e => e
   }
 

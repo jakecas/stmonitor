@@ -1,9 +1,9 @@
-import re, socket
+import re, socket, sys, time
 
 SERVER_HOST = '127.0.0.1'
 SERVER_PORT = 4021
 MON_HOST = '127.0.0.1'
-MON_PORT = int(sys.argv[2])
+MON_PORT = int(sys.argv[1])
 
 MSG_READ_RE = re.compile('''^READ +(.+)''')
 MSG_WRITE_RE = re.compile('''^WRITE +(.+)''')
@@ -82,7 +82,7 @@ def handle_read(s, msg, m):
 def handle_write(s, msg, m):
     print("[S] Received WRITE request.")
     filename = msg.group(1)
-    file = open("/home/jakec/Workspace/Uni/Thesis/Code/stmonitor/scripts/ftp/server/"+filename, 'w')
+    file = open("/home/jakec/Thesis/scripts/splitftp/server/"+filename, 'w')
     send_wrapper(s, m, str.encode(MSG_ACKWI + "\n"))
 
     req = recv_wrapper(s, m, 552)

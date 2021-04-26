@@ -1,0 +1,21 @@
+This file will have some edge cases. Here's a few empty lines:
+
+
+
+The following line is too long to send in one message:
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut aliquet euismod erat et bibendum. Quisque eu eros magna. Vestibulum porttitor dignissim urna in sagittis. Praesent eleifend orci augue, sit amet mollis felis bibendum ac. Aenean arcu eros, vehicula accumsan aliquet at, vulputate vel dui. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Quisque justo nibh, egestas ac massa vitae, congue mollis eros. Nam metus leo, viverra eu dui accumsan, aliquam placerat lacus. Morbi felis erat, rutrum vitae tristique eget, ornare non elit. In egestas mauris.
+
+And now for some lines to pad out the file:
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis gravida a sapien sed hendrerit. Aliquam id nisi eget libero convallis interdum eu sit amet augue. Praesent volutpat nec ipsum quis mattis. Suspendisse a justo vitae purus fermentum vestibulum. Sed vitae dolor in velit egestas pulvinar. Fusce vitae luctus risus, nec dignissim massa. Curabitur ipsum diam, ultricies non faucibus eget, eleifend non arcu. Proin sem tellus, pellentesque vitae consequat ac, molestie ac tellus. Phasellus sed vehicula orci. Vestibulum ultrices nec nisl vel mollis. Aenean eget mollis turpis. Quisque a lorem quis leo rhoncus lacinia et sit amet leo. Pellentesque volutpat congue vulputate. Nam porta urna quis ultricies consequat. Ut purus mi, maximus nec malesuada in, sodales non orci.
+
+Suspendisse elementum hendrerit dolor, eget rhoncus leo egestas a. Ut venenatis metus nec rhoncus ullamcorper. Etiam molestie urna ut tortor rhoncus lobortis nec non arcu. Cras nec velit varius, varius sapien et, vestibulum lorem. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vivamus ut velit a dolor semper tristique vitae sit amet quam. Pellentesque tristique aliquam rhoncus.
+
+Aenean blandit elit sed lacus euismod, id viverra dolor luctus. Curabitur varius a nisl ac vulputate. Phasellus enim mauris, aliquet vel justo id, sodales fermentum orci. Nunc vitae lorem blandit, rhoncus felis in, scelerisque eros. Quisque diam leo, posuere vitae dapibus nec, rutrum id tortor. Maecenas bibendum, massa viverra tempor auctor, mi eros laoreet urna, vel aliquam nisl mauris sed lacus. In hac habitasse platea dictumst. Etiam eleifend sagittis luctus. Curabitur posuere metus sit amet eros pharetra, non hendrerit orci vehicula. Pellentesque ligula ex, consequat eu eros vitae, molestie mollis eros. Nullam scelerisque elementum nulla, ac posuere enim eleifend eu.
+
+Proin vitae rhoncus lacus, in semper libero. Phasellus eu nulla dolor. Maecenas sed tincidunt libero. Phasellus porta sodales accumsan. Etiam pellentesque erat eget mauris maximus accumsan. Aliquam sit amet neque sagittis, vestibulum eros et, molestie quam. Phasellus sapien neque, tempus id maximus quis, dictum sit amet leo.
+
+Vestibulum blandit felis eget sem tempor cursus. Aliquam laoreet ligula nisl, sit amet ornare arcu semper quis. Nunc sed justo ac nisi fermentum bibendum. Aenean nulla mauris, venenatis vel mattis a, tristique et tellus. Phasellus nibh lorem, scelerisque in ante id, ultricies iaculis sapien. Fusce quis purus varius, tempor est vel, sollicitudin elit. Quisque feugiat odio quis quam tincidunt iaculis. Maecenas est neque, dictum malesuada metus vel, tincidunt faucibus neque. Praesent consequat at lectus sit amet cursus. Donec mollis nisi risus, vitae luctus magna molestie sit amet.
+
+Donec tellus odio, rhoncus at pellentesque nec, malesuada quis ligula. Aliquam a lorem vel lorem rhoncus accumsan. Mauris at mauris aliquet, lacinia est id, suscipit odio. Donec posuere, mi ut euismod lobortis, nisl risus malesuada nulla, nec venenatis felis enim pharetra lectus. Quisque nisi elit, dictum eu viverra malesuada, dapibus quis felis. Sed sit amet dolor non odio pellentesque pellentesque nec et nibh. Donec dignissim augue purus, eget placerat ipsum ullamcorper in. In efficitur suscipit mauris nec tincidunt.
+
+End of File.

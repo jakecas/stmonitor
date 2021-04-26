@@ -2,9 +2,9 @@ import re, socket, time, sys
 from timeit import Timer
 
 SERVER_HOST = '127.0.0.1'
-SERVER_PORT = int(sys.argv[1])
+SERVER_PORT = 4021
 MON_HOST = '127.0.0.1'
-MON_PORT = int(sys.argv[2])
+MON_PORT = int(sys.argv[1])
 
 MSG_BLOCKR_RE = re.compile('''^BLOCKR ([0-9]+) ([0-9]+) ([\S\s]+)''')
 MSG_ACKWI_RE = re.compile('''^ACKWI''')
@@ -31,7 +31,7 @@ def recv_wrapper(s, m, size):
 
 def handle_read(s, m, filename):
     send_wrapper(s, m, str.encode(MSG_READ + filename + '\n'))
-    file = open("/home/jakec/Workspace/Uni/Thesis/Code/stmonitor/scripts/ftp/client/"+filename, 'w')
+    file = open("/home/jakec/Thesis/scripts/splitftp/client/"+filename, 'w')
 
     req = recv_wrapper(s, m, 552)
     block = MSG_BLOCKR_RE.match(req)
@@ -47,7 +47,7 @@ def handle_read(s, m, filename):
     file.close()
 
 
-def handle_write(s, filename):
+def handle_write(s, m, filename):
     send_wrapper(s, m, str.encode(MSG_WRITE + filename + '\n'))
     rsp = recv_wrapper(s, m, 6)
     if MSG_ACKWI_RE.match(rsp) is None:
@@ -94,8 +94,8 @@ elif write:
     for i in range(iterations):
         handle_write(s, m, file)
 
-t = Timer(lambda: handle_write(s, m, file))
-print(min(t.repeat(repeat=1000, number=1)))
+#t = Timer(lambda: handle_write(s, m, file))
+#print(min(t.repeat(repeat=1000, number=1)))
 
 
 send_wrapper(s, m, str.encode(MSG_CLOSE))

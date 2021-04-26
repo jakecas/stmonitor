@@ -1,4 +1,4 @@
-package benchmarks.splitftp
+package examples.splitftp
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.Duration

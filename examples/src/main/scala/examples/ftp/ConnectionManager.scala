@@ -1,4 +1,4 @@
-package benchmarks.ftp
+package examples.ftp
 
 import java.io._
 import java.net.{ServerSocket, Socket}

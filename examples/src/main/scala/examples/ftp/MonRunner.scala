@@ -1,4 +1,4 @@
-package benchmarks.ftp
+package examples.ftp
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
