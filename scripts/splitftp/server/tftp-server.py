@@ -39,7 +39,7 @@ def serve(srv, m):
 
 def handle_connection(s, m):
     while 1:
-        print('[S] Waiting for READ, WRITE or CLOSE request')
+#        print('[S] Waiting for READ, WRITE or CLOSE request')
         req = recv_wrapper(s, m, 1024)
         m_read = MSG_READ_RE.match(req)
         m_write = MSG_WRITE_RE.match(req)
@@ -58,7 +58,7 @@ def handle_connection(s, m):
 
 
 def handle_read(s, msg, m):
-    print("[S] Received READ request.")
+#    print("[S] Received READ request.")
     filename = msg.group(1)
     file = open(filename, 'r')
     filecontents = file.read()
@@ -80,7 +80,7 @@ def handle_read(s, msg, m):
 
 
 def handle_write(s, msg, m):
-    print("[S] Received WRITE request.")
+#    print("[S] Received WRITE request.")
     filename = msg.group(1)
     file = open("/home/jakec/Thesis/scripts/splitftp/server/"+filename, 'w')
     send_wrapper(s, m, str.encode(MSG_ACKWI + "\n"))
