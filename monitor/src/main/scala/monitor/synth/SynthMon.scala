@@ -19,9 +19,9 @@ class SynthMon(sessionTypeInterpreter: STInterpreter, path: String, partialIdent
    */
   def startInit(preamble: String): Unit = {
     if (preamble!="") mon.append(preamble+"\n")
-    mon.append("\nimport monitor.util.ConnectionManager\nimport scala.concurrent.ExecutionContext\nimport scala.concurrent.duration.Duration\nimport scala.util.control.TailCalls.{TailRec, done, tailcall}\nclass Monitor(cm: ConnectionManager) ")
+    mon.append("\nimport monitor.util.ConnectionManager\nimport scala.concurrent.ExecutionContext\nimport scala.concurrent.duration.Duration\nimport scala.util.control.TailCalls.{TailRec, done, tailcall}\n")
 
-    mon.append("$, max: Int, report: String => Unit)")
+    mon.append("class Monitor(cm: ConnectionManager, max: Int, report: String => Unit)")
 
     mon.append("(implicit ec: ExecutionContext, timeout: Duration) extends Runnable {\n")
     mon.append("\tobject payloads {\n")

@@ -31,19 +31,21 @@ def recv_wrapper(s, m, size):
 
 def handle_read(s, m, filename):
     send_wrapper(s, m, str.encode(MSG_READ + filename + '\n'))
-    file = open("/home/jakec/Thesis/scripts/splitftp/client/"+filename, 'w')
+    data = ""
 
     req = recv_wrapper(s, m, 552)
     block = MSG_BLOCKR_RE.match(req)
 
     while block.group(2) == "512":
-        file.write(block.group(3))
+        data += block.group(3)
         send_wrapper(s, m, str.encode(MSG_ACKR + block.group(1) + "\n"))
         req = recv_wrapper(s, m, 552)
         block = MSG_BLOCKR_RE.match(req)
 
-    file.write(block.group(3))
+    data += block.group(3)
     send_wrapper(s, m, str.encode(MSG_ACKRF + "\n"))
+    file = open("/home/jakec/Thesis/scripts/splitftp/client/"+filename, 'w')
+    file.write(data)
     file.close()
 
 

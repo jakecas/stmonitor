@@ -7,6 +7,10 @@ object ClientMonRunner extends App {
   val timeout = Duration.Inf
   val clientPort = args(0).toInt //4000
   val cm = new ConnectionManager(clientPort)
-  val Mon = new Mon(cm)(global, timeout)
+
+  def report(msg: String): Unit = {
+    println(msg)
+  }
+  val Mon = new Monitor(cm, 3, report)(global, timeout)
   Mon.run()
 }

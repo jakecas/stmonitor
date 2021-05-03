@@ -82,20 +82,22 @@ def handle_read(s, msg, m):
 def handle_write(s, msg, m):
 #    print("[S] Received WRITE request.")
     filename = msg.group(1)
-    file = open("/home/jakec/Thesis/scripts/splitftp/server/"+filename, 'w')
+    data = ""
     send_wrapper(s, m, str.encode(MSG_ACKWI + "\n"))
 
     req = recv_wrapper(s, m, 552)
     block = MSG_BLOCKW_RE.match(req)
 
     while block.group(2) == "512":
-        file.write(block.group(3))
+        data += block.group(3)
         send_wrapper(s, m, str.encode(MSG_ACKW + block.group(1) + '\n'))
         req = recv_wrapper(s, m, 552)
         block = MSG_BLOCKW_RE.match(req)
 
-    file.write(block.group(3))
+    data += block.group(3)
     send_wrapper(s, m, str.encode(MSG_ACKWF + '\n'))
+    file = open("/home/jakec/Thesis/scripts/splitftp/server/"+filename, 'w')
+    file.write(data)
     file.close()
 
 

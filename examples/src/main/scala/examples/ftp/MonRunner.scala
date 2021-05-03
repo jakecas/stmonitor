@@ -8,6 +8,10 @@ object MonRunner extends App {
   val serverPort = args(0).toInt //4021
   val clientPort = args(1).toInt //4000
   val cm = new ConnectionManager(serverPort, clientPort)
-  val Mon = new Mon(cm)(global, timeout)
+
+  def report(msg: String): Unit = {
+          println(msg)
+        }
+  val Mon = new Monitor(cm, 3, report)(global, timeout)
   Mon.run()
 }
