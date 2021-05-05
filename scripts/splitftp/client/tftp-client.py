@@ -88,23 +88,25 @@ while m.connect_ex((MON_HOST,MON_PORT)) != 0:
 
 if transfertime:
     logfile = open(sys.argv[5], 'w')
+    t = []
     if read:
-        t = Timer(lambda: handle_write(s, file))
-        logfile.write(t.repeat(repeat=iterations, number=1))
+        t = Timer(lambda: handle_read(s, m, file))
     elif write:
-        t = Timer(lambda: handle_write(s, file))
-        logfile.write(t.repeat(repeat=iterations, number=1))
+        t = Timer(lambda: handle_write(s, m, file))
+    timevals = t.repeat(repeat=iterations, number=1)
+    for val in timevals:
+        logfile.write(str(val) + ",")
 else:
     if read and write:
         for i in range(iterations):
-            handle_read(s, file)
-            handle_write(s, file)
+            handle_read(s, m, file)
+            handle_write(s, m, file)
     elif read:
         for i in range(iterations):
-            handle_read(s, file)
+            handle_read(s, m, file)
     elif write:
         for i in range(iterations):
-            handle_write(s, file)
+            handle_write(s, m, file)
 
 
 send_wrapper(s, m, str.encode(MSG_CLOSE))
