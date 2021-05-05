@@ -64,26 +64,32 @@ def handle_write(s, filename):
 iterations = int(sys.argv[2])
 read = 'r' in str(sys.argv[3])
 write = 'w' in str(sys.argv[3])
+transfertime = 't' in str(sys.argv[3])
 file = str(sys.argv[4])
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 while s.connect_ex((SERVER_HOST,SERVER_PORT)) != 0:
     time.sleep(0.1)
 
-if read and write:
-    for i in range(iterations):
-        handle_read(s, file)
-        handle_write(s, file)
-elif read:
-    for i in range(iterations):
-        handle_read(s, file)
-elif write:
-    for i in range(iterations):
-        handle_write(s, file)
-
-#t = Timer(lambda: handle_write(s, file))
-#print(min(t.repeat(repeat=1000, number=1)))
-
+if transfertime:
+    logfile = open(sys.argv[5], 'w')
+    if read:
+        t = Timer(lambda: handle_write(s, file))
+        logfile.write(t.repeat(repeat=iterations, number=1))
+    elif write:
+        t = Timer(lambda: handle_write(s, file))
+        logfile.write(t.repeat(repeat=iterations, number=1))
+else:
+    if read and write:
+        for i in range(iterations):
+            handle_read(s, file)
+            handle_write(s, file)
+    elif read:
+        for i in range(iterations):
+            handle_read(s, file)
+    elif write:
+        for i in range(iterations):
+            handle_write(s, file)
 
 s.sendall(str.encode(MSG_CLOSE))
 s.close()
