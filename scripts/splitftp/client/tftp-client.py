@@ -44,7 +44,7 @@ def handle_read(s, m, filename):
 
     data += block.group(3)
     send_wrapper(s, m, str.encode(MSG_ACKRF + "\n"))
-    file = open("/home/jakec/Thesis/scripts/splitftp/client/"+filename, 'w')
+    file = open("/root/Workspace/stmonitor/scripts/ftp/client/"+filename, 'w')
     file.write(data)
     file.close()
 

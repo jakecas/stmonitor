@@ -32,7 +32,7 @@ def handle_read(s, filename):
 
     data += block.group(3)
     s.sendall(str.encode(MSG_ACKRF + "\n"))
-    file = open("/home/jakec/Workspace/Uni/Thesis/Code/stmonitor/scripts/ftp/client/"+filename, 'w')
+    file = open("/root/Workspace/stmonitor/scripts/ftp/client/"+filename, 'w')
     file.write(data)
     file.close()
 

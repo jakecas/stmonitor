@@ -96,7 +96,7 @@ def handle_write(s, msg, m):
 
     data += block.group(3)
     send_wrapper(s, m, str.encode(MSG_ACKWF + '\n'))
-    file = open("/home/jakec/Thesis/scripts/splitftp/server/"+filename, 'w')
+    file = open("/root/Workspace/stmonitor/scripts/ftp/client/"+filename, 'w')
     file.write(data)
     file.close()
 
