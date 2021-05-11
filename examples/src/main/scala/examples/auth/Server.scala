@@ -37,7 +37,7 @@ object Server {
                   toMon.write(s"RES content\n"); toMon.flush()
                 }
               case rvkR(rvkTok) =>
-                println(f"[S] Received Rvk(${rvkTok}): terminating")
+//                println(f"[S] Received Rvk(${rvkTok}): terminating")
                 return
             }
           }
