@@ -27,32 +27,32 @@ class ConnectionManager(var serverPort: Int, var clientSocket: ServerSocket) {
   }
 
   def receiveFromClient(): Any = clientOut.readLine() match {
-    case authR(uname, pwd) => println(s"[CM] Received AUTH ${uname} ${pwd}"); Auth(uname, pwd);
-    case getR(resource, tok) => println(s"[CM] Received GET ${resource} ${tok}"); Get(resource, tok);
-    case rvkR(tok) => println(s"[CM] Received RVK ${tok}"); Rvk(tok);
+    case authR(uname, pwd) => Auth(uname, pwd);
+    case getR(resource, tok) => Get(resource, tok);
+    case rvkR(tok) => Rvk(tok);
     case e => e
   }
 
   def receiveFromServer(): Any = serverOut.readLine() match {
-    case succR(tok) => println("[CM] Received Success"); Succ(tok);
-    case failR(code) => println("[CM] Received Failure"); Fail(code.toInt);
-    case resR(content) => println("[CM] Received Result"); Res(content);
-    case timeoutR() => println("[CM] Received Timeout"); Timeout();
+    case succR(tok) => Succ(tok);
+    case failR(code) => Fail(code.toInt);
+    case resR(content) => Res(content);
+    case timeoutR() => Timeout();
     case e => e
   }
 
   def sendToClient(x: Any): Unit = x match {
-    case Succ(tok) => println("[CM] Sending Success"); clientIn.write(f"SUCC ${tok}\n"); clientIn.flush();
-    case Res(content) => println("[CM] Sending Res"); clientIn.write(f"RES $content\n"); clientIn.flush();
-    case Timeout() => println("[CM] Sending Timeout"); clientIn.write(f"Timeout\n"); clientIn.flush();
-    case Fail(code) => println("[CM] Sending Fail"); clientIn.write(f"FAIL $code\n"); clientIn.flush();
+    case Succ(tok) => clientIn.write(f"SUCC ${tok}\n"); clientIn.flush();
+    case Res(content) => clientIn.write(f"RES $content\n"); clientIn.flush();
+    case Timeout() => clientIn.write(f"Timeout\n"); clientIn.flush();
+    case Fail(code) => clientIn.write(f"FAIL $code\n"); clientIn.flush();
     case msg => close(); throw new Exception(s"[CM] Error: Unexpected message ${msg} by Mon");
   }
 
   def sendToServer(x: Any): Unit = x match {
-    case Auth(uname, pwd) => println("[CM] Sending Auth"); serverIn.write(f"AUTH ${uname} ${pwd}\n"); serverIn.flush();
-    case Get(resource, reqTok) => println("[CM] Sending Get"); serverIn.write(f"GET ${resource} ${reqTok}\n"); serverIn.flush();
-    case Rvk(rvkTok) => println("[CM] Sending Rvk"); serverIn.write(f"RVK ${rvkTok}\n"); serverIn.flush();
+    case Auth(uname, pwd) => serverIn.write(f"AUTH ${uname} ${pwd}\n"); serverIn.flush();
+    case Get(resource, reqTok) => serverIn.write(f"GET ${resource} ${reqTok}\n"); serverIn.flush();
+    case Rvk(rvkTok) => serverIn.write(f"RVK ${rvkTok}\n"); serverIn.flush();
     case msg => close(); throw new Exception(s"[CM] Error: Unexpected message ${msg} by Mon");
   }
 

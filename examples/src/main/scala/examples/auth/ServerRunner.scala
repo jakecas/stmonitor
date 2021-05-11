@@ -12,13 +12,14 @@ object ServerRunner extends App {
   val server = new java.net.ServerSocket(1330)
   var count = args(0).toInt
 
+  println(s"Started server for ${count} iterations!")
   while(count > 0) {
     val mon = server.accept()
 
     val monIn = new BufferedWriter(new OutputStreamWriter(mon.getOutputStream))
     val monOut = new BufferedReader(new InputStreamReader(mon.getInputStream))
     Server(monIn, monOut)(global, timeout)
-    println("Server closed. Restarting...")
+//    println("Server closed. Restarting...")
     count -= 1
   }
 }

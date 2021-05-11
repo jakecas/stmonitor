@@ -16,6 +16,7 @@ object MonRunner extends App {
   }
 
   val clientSocket = new ServerSocket(clientPort)
+  println(s"Started monitor for ${count} iterations!")
 
   while(count > 0) {
     try {
