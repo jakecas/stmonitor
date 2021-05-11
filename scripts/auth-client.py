@@ -42,7 +42,11 @@ def connect_and_auth():
         print("[C] Sending: " + req)
         s.sendall(str.encode(req + "\n"))
 
-t = Timer(lambda: connect_and_auth())
-print(min(t.repeat(repeat=int(sys.argv[2]), number=1)))
-end = time.time()
-print("Total time: ", end - start)
+#t = Timer(lambda: connect_and_auth())
+timevals = t.repeat(repeat=int(sys.argv[2]), number=1)))
+#end = time.time()
+#print("Total time: ", end - start)
+
+logfile = open(sys.argv[3], 'w')
+for val in timevals:
+    logfile.write(str(val) + ",")

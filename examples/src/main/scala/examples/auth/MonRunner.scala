@@ -6,8 +6,9 @@ import scala.concurrent.duration._
 
 object MonRunner extends App {
   val timeout = Duration.Inf
-  val serverPort = args(0).toInt //1335
-  val clientPort = args(1).toInt //1330
+  val serverPort = 1330
+  val clientPort = 1335
+  var count = args(0).toInt
 
 
   def report(msg: String): Unit = {
@@ -16,11 +17,12 @@ object MonRunner extends App {
 
   val clientSocket = new ServerSocket(clientPort)
 
-  while(true) {
+  while(count > 0) {
     try {
       val cm = new ConnectionManager(serverPort, clientSocket)
       val Mon = new Monitor(cm, 3, report)(global, timeout)
       Mon.run()
+      count -= 1
     } catch {
       case _: ConnectException => println("Socket exception, trying again..."); Thread.sleep(100)
     }
