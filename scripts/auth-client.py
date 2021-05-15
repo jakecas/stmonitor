@@ -14,7 +14,6 @@ MSG_FAIL_RE = re.compile('''^FAIL +(.+)''')
 MSG_RES_RE = re.compile('''^RES +(.+)''')
 MSG_TIMEOUT = re.compile('''^TIMEOUT''')
 
-start = time.time()
 
 def connect_and_auth():
     #print('[C] Client started')
@@ -44,6 +43,7 @@ def connect_and_auth():
 
 
 print("Starting client.")
+#start = time.time()
 t = Timer(lambda: connect_and_auth())
 timevals = t.repeat(repeat=int(sys.argv[2]), number=1)
 #end = time.time()
