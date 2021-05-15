@@ -39,23 +39,23 @@ def connect_and_auth():
         time.sleep(0.1)
 
     req = 'AUTH Bob ro5'
-    print("[C] Sending: " + req)
+    #print("[C] Sending: " + req)
     send_wrapper(s, m, str.encode(req + '\n'))
     rsp = recv_wrapper(s, m, 32)
-    print("[C] Received:" + rsp)
+    #print("[C] Received:" + rsp)
 
     msg = MSG_SUCC_RE.match(rsp)
     if (msg is not None):
         tok = msg.group(1)
         req = "GET whatever "+ str(tok)
-        print("[C] Sending: " + req)
+        #print("[C] Sending: " + req)
         send_wrapper(s, m, str.encode(req + '\n'))
 
         rsp = recv_wrapper(s, m, 32)
-        print("[C] Received:" + rsp)
+        #print("[C] Received:" + rsp)
 
         req = "RVK " + str(tok)
-        print("[C] Sending: " + req)
+        #print("[C] Sending: " + req)
         send_wrapper(s, m, str.encode(req + '\n'))
 
 
