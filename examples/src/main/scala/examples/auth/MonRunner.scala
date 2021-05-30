@@ -25,7 +25,7 @@ object MonRunner extends App {
       Mon.run()
       count -= 1
     } catch {
-      case _: ConnectException => println("Socket exception, trying again..."); Thread.sleep(100)
+      case _: ConnectException => println("Socket exception, trying again..."); Thread.sleep(10)
     }
   }
 }

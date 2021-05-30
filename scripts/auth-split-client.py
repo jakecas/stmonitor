@@ -60,12 +60,13 @@ def connect_and_auth():
 
 
 print("Starting client.")
-#start = time.time()
-t = Timer(lambda: connect_and_auth())
-timevals = t.repeat(repeat=int(sys.argv[3]), number=1)
-#end = time.time()
-#print("Total time: ", end - start)
+if "rt" in sys.argv[3]:
+    t = Timer(lambda: connect_and_auth())
+    timevals = t.repeat(repeat=int(sys.argv[4]), number=1)
 
-logfile = open(sys.argv[4], 'w')
-for val in timevals:
-    logfile.write(str(val) + ",")
+    logfile = open(sys.argv[5], 'w')
+    for val in timevals:
+        logfile.write(str(val) + ",")
+else:
+    for i in range(int(sys.argv[4])):
+        connect_and_auth()

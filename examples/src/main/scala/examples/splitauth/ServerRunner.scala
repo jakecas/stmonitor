@@ -20,11 +20,10 @@ object ServerRunner extends App {
     var notconnected = true
     while (notconnected){
       try {
-        Thread.sleep(1000)
         mon = new Socket("127.0.0.1", 1331)
         notconnected = false;
       } catch {
-        case _: ConnectException => println("Socket exception, trying again..."); Thread.sleep(100)
+        case _: ConnectException => println("Socket exception, trying again..."); Thread.sleep(10)
       }
     }
 
@@ -32,6 +31,8 @@ object ServerRunner extends App {
     val clientOut = new BufferedReader(new InputStreamReader(client.getInputStream))
     val monIn = new BufferedWriter(new OutputStreamWriter(mon.getOutputStream))
     Server(clientIn, clientOut, monIn)(global, timeout)
+    clientIn.close(); clientOut.close()
+    monIn.close()
 //    println("Server closed. Restarting...")
     count -= 1
   }

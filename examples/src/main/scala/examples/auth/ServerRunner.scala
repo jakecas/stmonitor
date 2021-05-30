@@ -19,6 +19,7 @@ object ServerRunner extends App {
     val monIn = new BufferedWriter(new OutputStreamWriter(mon.getOutputStream))
     val monOut = new BufferedReader(new InputStreamReader(mon.getInputStream))
     Server(monIn, monOut)(global, timeout)
+    monIn.close(); monOut.close()
 //    println("Server closed. Restarting...")
     count -= 1
   }

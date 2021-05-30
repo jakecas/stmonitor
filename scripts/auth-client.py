@@ -19,7 +19,7 @@ def connect_and_auth():
     #print('[C] Client started')
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while s.connect_ex((SERVER_HOST,SERVER_PORT)) != 0:
-        time.sleep(0.1)
+        time.sleep(0.01)
 
     req = 'AUTH Bob ro5'
     #print("[C] Sending: " + req)
@@ -43,12 +43,13 @@ def connect_and_auth():
 
 
 print("Starting client.")
-#start = time.time()
-t = Timer(lambda: connect_and_auth())
-timevals = t.repeat(repeat=int(sys.argv[2]), number=1)
-#end = time.time()
-#print("Total time: ", end - start)
 
-logfile = open(sys.argv[3], 'w')
-for val in timevals:
-    logfile.write(str(val) + ",")
+if "rt" in sys.argv[2]:
+    t = Timer(lambda: connect_and_auth())
+    timevals = t.repeat(repeat=int(sys.argv[3]), number=1)
+    logfile = open(sys.argv[4], 'w')
+    for val in timevals:
+        logfile.write(str(val) + ",")
+else:
+    for i in range(int(sys.argv[3])):
+        connect_and_auth()
