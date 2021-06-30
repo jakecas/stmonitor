@@ -1,5 +1,7 @@
 # STMonitor - Modified Session Types Monitor Synthesiser
 
+This code is hosted on github at the following URL: https://github.com/jakecas/stmonitor, where the master branch leaves everything untouched (is a direct clone of the original project), and the develop branch represents our work in 'An Evaluation of Monitor Configurations for Binary Session Types in Scala'.
+
 Given a session type _S_, this tool will synthesize a partial-identity monitor or a sequence recogniser depending on the parameter given. 
 See monitor/Generate for this usage. It will also generate any classes necessary for the monitors.
 
