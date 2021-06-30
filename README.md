@@ -25,11 +25,16 @@ but this will require manually starting each of the client, server, and monitor.
 
 ## Directory Structure
 
-examples/ holds the scala source code for each example. In the auth and splitauth cases, for partial-id monitors and sequence recognisers respectively,
+* examples/ holds the scala source code for each example. In the auth and splitauth cases, for partial-id monitors and sequence recognisers respectively,
 	this means both the monitor *and* the server, which must be run independently. Meanwhile, ftp and splitftp only house their respective monitors.
-lchannels/ holds the dependency this project used to have, a small part is still required for use in communication between processes.
-monitor/ is the directory for the actual (modified) synthesizer which given a session type will generate the appropriate monitor and protocol classes.
-project/ describes the project for sbt to be able to compile and assemble the code.
-scripts/ holds the client scripts for the auth test cases, client and server scripts for the ftp test cases, 
+
+* lchannels/ holds the dependency this project used to have, a small part is still required for use in communication between processes.
+
+* monitor/ is the directory for the actual (modified) synthesizer which given a session type will generate the appropriate monitor and protocol classes.
+
+* project/ describes the project for sbt to be able to compile and assemble the code.
+
+* scripts/ holds the client scripts for the auth test cases, client and server scripts for the ftp test cases, 
 	as well as benchmark scripts for both that will run a large number of tests repeatedly and output results to a log directory.
-visualisation/ holds the python scripts used to generate graphs for the report, they are self-explanatory, but have some hard-coded directories which must be changed if they need to be used again.
+
+* visualisation/ holds the python scripts used to generate graphs for the report, they are self-explanatory, but have some hard-coded directories which must be changed if they need to be used again.
